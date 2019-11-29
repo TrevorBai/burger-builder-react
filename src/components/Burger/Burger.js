@@ -1,8 +1,10 @@
 import React from 'react'
+// import { withRouter } from 'react-router-dom'
 import classes from './Burger.module.css'
 import BurgerIngredient from './BurgerIngredient/BurgerIngredient'
 
 const Burger = props => {
+
   let transformedIngredients = Object.keys(props.ingredients)
     .map(
       ingredient => {
@@ -11,7 +13,7 @@ const Burger = props => {
         )
       }
     )
-    .reduce((acc, cur) => acc.concat(cur))
+    .reduce((acc, cur) => acc.concat(cur), [])  // props.ingredients could be empty array, so [] is necessary
   
   if (transformedIngredients.length === 0) {
     transformedIngredients = <p>Please start adding ingredients!</p>
@@ -26,4 +28,5 @@ const Burger = props => {
   )
 }
 
+// export default withRouter(Burger)
 export default Burger
