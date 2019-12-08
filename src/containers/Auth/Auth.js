@@ -6,6 +6,7 @@ import Button from '../../components/UI/Button/Button'
 import classes from './Auth.module.css'
 import * as actions from '../../store/actions/index'
 import Spinner from '../../components/UI/Spinner/Spinner'
+import { updateObject, checkValidatity } from '../../shared/utility'
 
 class Auth extends Component {
   state = {
@@ -48,38 +49,18 @@ class Auth extends Component {
     }
   }
 
-  checkValidatity = (value, rules) => {
-    let isValid = true
-    if (!rules) {  // Redundent double security
-      return true
-    }
-
-    if (rules.required) {
-      isValid = value.trim() !== '' && isValid
-    }
-
-    if (rules.minLength) {
-      isValid = value.trim().length >= rules.minLength && isValid
-    }
-
-    if (rules.maxLength) {
-      isValid = value.trim().length <= rules.maxLength && isValid
-    }
-
-    return isValid
-  }
-
   inputChangedHandler = (event, controlName) => {
-    // console.log(event.target.value)
-    const updatedControls = { 
-      ...this.state.controls,
-      [controlName]: {
-        ...this.state.controls[controlName],
+    const updatedControls = updateObject(
+      this.state.controls,
+      {
+        [controlName]: updateObject(
+        this.state.controls[controlName],
+        {
         value: event.target.value,
-        valid: this.checkValidatity(event.target.value, this.state.controls[controlName].validation),
+        valid: checkValidatity(event.target.value, this.state.controls[controlName].validation),
         touched: true
-      }
-    }
+        })
+    })
     this.setState({ controls: updatedControls })
   }
 

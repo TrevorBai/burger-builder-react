@@ -27,12 +27,9 @@ export const purchaseBurger = (orderData, token) => {
     dispatch(purchaseBurgerStart())
     Axios.post(`/orders.json?auth=${token}`, orderData)
       .then(res => {
-        // this.setState({ loading: false })
-        // console.log(res.data.name)  // check if id is in it?
         dispatch(purchaseBurgerSuccess(res.data.name, orderData))
       })
       .catch(e => {
-        // this.setState({ loading: false })
         dispatch(puchaseBurgerFail(e))
       })
   }

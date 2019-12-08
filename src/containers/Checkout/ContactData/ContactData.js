@@ -7,6 +7,7 @@ import Spinner from '../../../components/UI/Spinner/Spinner'
 import Input from '../../../components/UI/Input/Input'
 import WithErrorHandler from '../../../hoc/WithErrorHandler/WithErrorHandler'
 import * as orderActions from '../../../store/actions/index'
+import { updateObject, checkValidatity } from '../../../shared/utility'
 
 class ContactData extends Component {
   state = {  // potential local UI state
@@ -102,8 +103,6 @@ class ContactData extends Component {
 
   orderHandler = event => {
     event.preventDefault()
-    // console.log(this.props.ingredients)
-
     const formData = {}
     for (let formElementIdentifier in this.state.orderForm) {
       // formData.push({
@@ -122,36 +121,15 @@ class ContactData extends Component {
     this.props.onPurchaseBurger(order, this.props.token)
   }
 
-  checkValidatity = (value, rules) => {
-    let isValid = true
-    if (!rules) {  // Redundent double security
-      return true
-    }
-    
-    if (rules.required) {
-      isValid = value.trim() !== '' && isValid
-    }
-
-    if (rules.minLength) {
-      isValid = value.trim().length >= rules.minLength && isValid
-    }
-
-    if (rules.maxLength) {
-      isValid = value.trim().length <= rules.maxLength && isValid
-    }
-    
-    return isValid
-  }
-
   inputChangedHandler = (event, inputIdentifier) => {
-    // console.log(event.target.value)
-    const updatedOrderForm = {...this.state.orderForm}
-    const updatedFormElement = {...updatedOrderForm[inputIdentifier]}
-    updatedFormElement.value = event.target.value
-    updatedFormElement.valid = this.checkValidatity(updatedFormElement.value, updatedFormElement.validation)
-    updatedFormElement.touched = true
-    updatedOrderForm[inputIdentifier] = updatedFormElement
-    // console.log(updatedFormElement)
+    const updatedFormElement = updateObject(this.state.orderForm[inputIdentifier], {
+      value: event.target.value,
+      valid: checkValidatity(event.target.value, this.state.orderForm[inputIdentifier].validation),
+      touched: true
+    })
+    const updatedOrderForm = updateObject(
+      this.state.orderForm,
+      {[inputIdentifier]: updatedFormElement})
 
     let formIsValid = true
     for (let inputIdentifier in updatedOrderForm) {
@@ -179,7 +157,6 @@ class ContactData extends Component {
           invalid={!formElement.config.valid}
           shouldValidate={formElement.config.validation}
           touched={formElement.config.touched}
-          // valueType={formElement.config.elementConfig.type}
           errorMessage={`Please enter a valid ${formElement.config.elementConfig.type}!`}
           changed={(event) => this.inputChangedHandler(event, formElement.id)} />
       ))}
