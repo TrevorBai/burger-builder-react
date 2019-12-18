@@ -1,60 +1,24 @@
-import React, { Component } from 'react'
+import React from 'react'
 import Aux from '../Auxiliary/Auxiliary'
 import Modal from '../../components/UI/Modal/Modal'
+import useHttpErrorHandler from '../../hooks/http-error-handler'
 
-const WithErrorHandler = (WrappedComponent, Axios) => {
-  return class extends Component {  // just return an anonymous class
-    constructor(props) {
-      super(props)
-
-      this.reqInterceptor = Axios.interceptors.request.use(req => {
-        this.setState({ error: null })
-        return req
-      })
-
-      this.resInterceptor = Axios.interceptors.response.use(res => res, error => {
-        this.setState({ error })
-      })
-
-      this.state = {
-        error: null
-      }
-    }
-
-    // // componentWillMount is executed before its children components are loaded
-    // UNSAFE_componentWillMount = () => {
-    //   this.reqInterceptor = Axios.interceptors.request.use(req => {
-    //     this.setState({ error: null })
-    //     return req
-    //   })
-
-    //   this.resInterceptor = Axios.interceptors.response.use(res => res, error => {
-    //     this.setState({ error })
-    //   })
-    // }
-
-    componentWillUnmount = () => {
-      Axios.interceptors.request.eject(this.reqInterceptor)
-      Axios.interceptors.response.eject(this.resInterceptor)
-    }
-
-    errorConfirmedHandler = () => {
-      this.setState({ error: null })
-    }
-
-    render() {
-      return (
-        <Aux>
-          <Modal
-            show={this.state.error}
-            modalClosed={this.errorConfirmedHandler} >
-            {this.state.error ? this.state.error.message : null}
-          </Modal>
-          <WrappedComponent {...this.props} />
-        </Aux>
-      )
-    }
+// with CamelCase, React assumes it not to be a component, hence not breaking linting rules (call Hooks in a callback)
+const withErrorHandler = (WrappedComponent, Axios) => {
+  return props => {
+    const [error, clearError] = useHttpErrorHandler(Axios)
+    
+    return (
+      <Aux>
+        <Modal
+          show={error}
+          modalClosed={clearError} >
+          {error ? error.message : null}
+        </Modal>
+        <WrappedComponent {...props} />
+      </Aux>
+    )
   }
 }
 
-export default WithErrorHandler
+export default withErrorHandler

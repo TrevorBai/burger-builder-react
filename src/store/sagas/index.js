@@ -1,4 +1,4 @@
-import { takeEvery, all, takeLatest } from 'redux-saga/effects'
+import { takeEvery, all } from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes'
 import { logoutSaga, checkAuthTimeoutSaga, authSaga, authCheckStateSaga } from './auth'
 import { initIngredientsSaga } from './burgerBuilder'
